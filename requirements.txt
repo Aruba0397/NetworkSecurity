@@ -5,3 +5,6 @@ seaborn
 pymongo
 matplotlib
 scikit-learn
+certifi
+
+#-e .
