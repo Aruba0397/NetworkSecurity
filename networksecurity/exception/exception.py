@@ -18,12 +18,3 @@ class CustomException(Exception):
     def __str__(self):
         return self.error_message
 
-'''  
-if __name__=='__main__':
-    try:
-        logger.logging.info("enter try block")
-        a=1/0
-        print("this will not printed",a)
-    except Exception as e:
-        raise CustomException(e,sys)
-'''
