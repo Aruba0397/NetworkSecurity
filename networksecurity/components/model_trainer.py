@@ -16,6 +16,7 @@ from networksecurity.utils.ml_utils.metric.classification_metric import get_clas
 import sys
 import os
 import mlflow
+from urllib.parse import urlparse
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import r2_score
@@ -27,6 +28,14 @@ from sklearn.ensemble import (
     RandomForestClassifier,
 )
 
+
+import dagshub
+dagshub.init(repo_owner='Aruba0397', repo_name='NetworkSecurity', mlflow=True)
+
+os.environ["MLFLOW_TRACKING_URI"]="https://dagshub.com/Aruba0397/NetworkSecurity.mlflow"
+os.environ["MLFLOW_TRACKING_USERNAME"]="Aruba0397"
+os.environ["MLFLOW_TRACKING_PASSWORD"]="9f62af85e040b3b12010443ca5f9402ec6a764fd"
+
 class ModelTrainer:
     def __init__(self,model_trainer_config:ModelTrainerConfig, data_transformation_artifact:DataTransformationArtifact):
         try:
@@ -37,16 +46,24 @@ class ModelTrainer:
       
       # track mlflow
     def  track_mlflow(self, best_model, classificationmetric):
-        with mlflow.start_run():
-            f1_score=classificationmetric.f1_score
-            precision_score=classificationmetric.precision_score
-            recall_score=classificationmetric.recall_score
+        
+        mlflow.set_tracking_uri("https://dagshub.com/Aruba0397/NetworkSecurity.mlflow")
             
+        with mlflow.start_run():
+            # log metrics
+            f1_score = classificationmetric.f1_score
+            precision_score = classificationmetric.precision_score
+            recall_score = classificationmetric.recall_score
+                
             mlflow.log_metric("f1_score", f1_score)
             mlflow.log_metric("precision", precision_score)
             mlflow.log_metric("recall", recall_score)
+                
+            # log model (without model registry)
             mlflow.sklearn.log_model(best_model, "model")
-    
+                
+
+                
         #model evaluation
     def train_model(self,X_train,y_train,X_test,y_test):  
         models = {
@@ -119,7 +136,10 @@ class ModelTrainer:
         Network_Model=NetworkModel(preprocessor=preprocessor,model=best_model)
         
         #saving pickle file
-        save_object(self.model_trainer_config.trained_model_file_path,obj=NetworkModel)
+        save_object(self.model_trainer_config.trained_model_file_path,obj=Network_Model)
+        
+        #model pusher to final models folder for deployment
+        save_object("final_model/model.pkl", best_model)
         
         #creating model trainer artifact output of trainng and evaluation
         model_trainer_artifact=ModelTrainerArtifact(trained_model_file_path=self.model_trainer_config.trained_model_file_path,
