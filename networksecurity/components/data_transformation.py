@@ -60,7 +60,7 @@ class DataTransformation:
             target_feature_test_df=test_df[TARGET_COLUMN]
             target_feature_test_df=target_feature_test_df.replace(-1,0)
             
-            #applying Knn imputer
+            #applying Knn imputer to replace nan values 
             preprocessor=self.get_data_transformer_object()
             preprocessor_object=preprocessor.fit(input_feature_train_df) 
             transformed_input_train_feature=preprocessor_object.transform(input_feature_train_df)
