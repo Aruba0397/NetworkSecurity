@@ -75,7 +75,7 @@ class DataTransformation:
             save_object( self.data_transformation_config.transformed_object_file_path, preprocessor_object,)
             
             #model pusher ro final models folder for deployment
-            save_object("final_model/preprocessor.pkl", preprocessor_object)
+            save_object("final_models/preprocessor.pkl", preprocessor_object)
             #preparing output artifacts
             data_transformation_artifact = DataTransformationArtifact(
                 transformed_object_file_path=self.data_transformation_config.transformed_object_file_path,
